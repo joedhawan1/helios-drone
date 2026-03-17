@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Helios",
+    "slug": "helios-satellite",
+    "version": "1.0.0",
+    "scheme": "satellite-sunlight",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0E1A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.satellitesunlight.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to photograph target locations for satellite illumination commands.",
+        "NSLocationWhenInUseUsageDescription": "Your GPS coordinates are sent to the satellite to pinpoint the illumination target."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0A0E1A"
+      },
+      "package": "com.satellitesunlight.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Used to photograph target locations for satellite illumination commands."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Your GPS coordinates are sent to the satellite to pinpoint the illumination target."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
