@@ -1,9 +1,9 @@
 import type {
-  SatelliteSettings,
+  DroneSettings,
   IlluminateCommand,
   ConnectionStatus,
   IlluminationStatus,
-} from '../types/satellite';
+} from '../types/drone';
 
 type EventName =
   | 'status:connected'
@@ -28,7 +28,7 @@ type EventPayload = {
 
 type Listener<E extends EventName> = (payload: EventPayload[E]) => void;
 
-class SatelliteService {
+class DroneService {
   private _listeners = new Map<EventName, Set<(payload: unknown) => void>>();
   private _ws: WebSocket | null = null;
   private _pollInterval: ReturnType<typeof setInterval> | null = null;
@@ -64,7 +64,7 @@ class SatelliteService {
     this.emit('status:disconnected');
   }
 
-  async connect(settings: SatelliteSettings): Promise<void> {
+  async connect(settings: DroneSettings): Promise<void> {
     this.disconnect();
     this.emit('status:connecting');
 
@@ -89,7 +89,7 @@ class SatelliteService {
     });
   }
 
-  private _connectWS(settings: SatelliteSettings): Promise<void> {
+  private _connectWS(settings: DroneSettings): Promise<void> {
     return new Promise((resolve, reject) => {
       const url = `ws://${settings.host}:${settings.port}`;
       const ws = new WebSocket(url);
@@ -147,14 +147,14 @@ class SatelliteService {
     });
   }
 
-  private async _connectHTTP(settings: SatelliteSettings): Promise<void> {
+  private async _connectHTTP(settings: DroneSettings): Promise<void> {
     const base = `http://${settings.host}:${settings.port}`;
     const resp = await fetch(`${base}/ping`, { signal: AbortSignal.timeout(6000) });
-    if (!resp.ok) throw new Error('Satellite ping failed');
+    if (!resp.ok) throw new Error('Drone ping failed');
     this.emit('status:connected');
   }
 
-  async illuminate(cmd: IlluminateCommand, settings: SatelliteSettings): Promise<void> {
+  async illuminate(cmd: IlluminateCommand, settings: DroneSettings): Promise<void> {
     this.emit('illuminate:sending');
 
     if (settings.host === 'demo' || settings.host === '') {
@@ -200,7 +200,7 @@ class SatelliteService {
     return Promise.resolve();
   }
 
-  private async _illuminateHTTP(cmd: IlluminateCommand, settings: SatelliteSettings): Promise<void> {
+  private async _illuminateHTTP(cmd: IlluminateCommand, settings: DroneSettings): Promise<void> {
     const base = `http://${settings.host}:${settings.port}`;
     const resp = await fetch(`${base}/illuminate`, {
       method: 'POST',
@@ -246,4 +246,4 @@ class SatelliteService {
   }
 }
 
-export const satelliteService = new SatelliteService();
+export const droneService = new DroneService();

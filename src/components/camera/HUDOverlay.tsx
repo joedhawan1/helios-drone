@@ -3,7 +3,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBadge } from '../ui/StatusBadge';
 import { TargetingReticle } from './TargetingReticle';
-import type { ConnectionStatus, GpsCoordinates, IlluminationStatus } from '../../types/satellite';
+import type { ConnectionStatus, GpsCoordinates, IlluminationStatus } from '../../types/drone';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
 import { formatCoords, formatIlluminationStatus } from '../../utils/formatters';

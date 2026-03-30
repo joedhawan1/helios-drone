@@ -1,4 +1,4 @@
-import type { GpsCoordinates, ConnectionStatus, IlluminationStatus } from '../types/satellite';
+import type { GpsCoordinates, ConnectionStatus, IlluminationStatus } from '../types/drone';
 
 export function formatCoords(coords: GpsCoordinates): string {
   const lat = Math.abs(coords.latitude).toFixed(4);

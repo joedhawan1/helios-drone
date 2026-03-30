@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { ConnectionStatus, IlluminationStatus } from '../../types/satellite';
+import type { ConnectionStatus, IlluminationStatus } from '../../types/drone';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
 import {

@@ -13,13 +13,13 @@ import { HUDOverlay } from '../../src/components/camera/HUDOverlay';
 import { CaptureButton } from '../../src/components/camera/CaptureButton';
 import { GlowButton } from '../../src/components/ui/GlowButton';
 import { StatusBadge } from '../../src/components/ui/StatusBadge';
-import { useSatellite } from '../../src/hooks/useSatellite';
+import { useDrone } from '../../src/hooks/useDrone';
 import { useLocation } from '../../src/hooks/useLocation';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
 
 export default function CameraScreen() {
-  const { connectionStatus, illuminationStatus, connect, illuminate } = useSatellite();
+  const { connectionStatus, illuminationStatus, connect, illuminate } = useDrone();
   const { coords, error: locationError, requestLocation } = useLocation();
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
@@ -70,7 +70,7 @@ export default function CameraScreen() {
       <View style={[styles.container, styles.centered]}>
         <Text style={styles.permTitle}>Camera Access Required</Text>
         <Text style={styles.permBody}>
-          This app needs camera access to photograph target locations for satellite illumination.
+          This app needs camera access to photograph target locations for drone illumination.
         </Text>
         {permission.canAskAgain ? (
           <GlowButton label="Grant Permission" onPress={requestPermission} />

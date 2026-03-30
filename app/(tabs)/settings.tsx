@@ -5,14 +5,14 @@ import { Card } from '../../src/components/ui/Card';
 import { GlowButton } from '../../src/components/ui/GlowButton';
 import { StatusBadge } from '../../src/components/ui/StatusBadge';
 import { ConnectionForm } from '../../src/components/settings/ConnectionForm';
-import { useSatellite } from '../../src/hooks/useSatellite';
+import { useDrone } from '../../src/hooks/useDrone';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
-import type { SatelliteSettings } from '../../src/types/satellite';
+import type { DroneSettings } from '../../src/types/drone';
 
 export default function SettingsScreen() {
-  const { connectionStatus, settings, connect, disconnect, updateSettings } = useSatellite();
-  const [draft, setDraft] = useState<SatelliteSettings>(settings);
+  const { connectionStatus, settings, connect, disconnect, updateSettings } = useDrone();
+  const [draft, setDraft] = useState<DroneSettings>(settings);
   const [saved, setSaved] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -36,11 +36,11 @@ export default function SettingsScreen() {
     >
       {/* Header */}
       <Text style={styles.screenTitle}>SETTINGS</Text>
-      <Text style={styles.screenSubtitle}>Configure your satellite endpoint</Text>
+      <Text style={styles.screenSubtitle}>Configure your drone connection</Text>
 
       {/* Endpoint config */}
       <Card style={styles.card}>
-        <Text style={styles.sectionTitle}>SATELLITE ENDPOINT</Text>
+        <Text style={styles.sectionTitle}>DRONE CONNECTION</Text>
         <ConnectionForm values={draft} onChange={setDraft} />
       </Card>
 
@@ -62,7 +62,7 @@ export default function SettingsScreen() {
             <GlowButton label="DISCONNECT" variant="danger" onPress={disconnect} />
           ) : (
             <GlowButton
-              label="CONNECT TO SATELLITE"
+              label="CONNECT TO DRONE"
               variant="primary"
               onPress={connect}
               loading={isConnecting}
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
         <Text style={styles.hintBody}>
           Set Host to{' '}
           <Text style={styles.hintCode}>demo</Text>
-          {' '}to simulate a satellite connection without real hardware. All commands are simulated locally.
+          {' '}to simulate a drone connection without real hardware. All commands are simulated locally.
         </Text>
       </Card>
 

@@ -13,7 +13,7 @@ export type IlluminationStatus =
 
 export type Protocol = 'ws' | 'http';
 
-export interface SatelliteSettings {
+export interface DroneSettings {
   host: string;
   port: string;
   accessCode: string;
@@ -34,18 +34,18 @@ export interface IlluminateCommand {
   commandId: string;
 }
 
-export interface SatelliteContextValue {
+export interface DroneContextValue {
   connectionStatus: ConnectionStatus;
   illuminationStatus: IlluminationStatus;
-  settings: SatelliteSettings;
+  settings: DroneSettings;
   lastCommand: IlluminateCommand | null;
   connect: () => Promise<void>;
   disconnect: () => void;
   illuminate: (coords: GpsCoordinates, photoUri: string | null) => Promise<void>;
-  updateSettings: (settings: SatelliteSettings) => Promise<void>;
+  updateSettings: (settings: DroneSettings) => Promise<void>;
 }
 
-export const DEFAULT_SETTINGS: SatelliteSettings = {
+export const DEFAULT_SETTINGS: DroneSettings = {
   host: 'demo',
   port: '8080',
   accessCode: '',

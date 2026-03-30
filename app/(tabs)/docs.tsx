@@ -8,24 +8,24 @@ import { Layout } from '../../src/constants/layout';
 
 const faqs = [
   {
-    q: 'How do I get satellite access?',
-    a: 'Contact your satellite service provider directly to purchase or lease time on their satellite. They will provide you with a host address, port, and access code to enter in the Settings tab.',
+    q: 'How do I connect to my drone?',
+    a: 'Make sure your drone\'s companion computer (Raspberry Pi) is running the drone-server software and your phone is connected to the drone\'s WiFi hotspot (SSID: HELIOS-DRONE). Enter the drone\'s IP address (default: 192.168.4.1), port (8080), and access code (if set) in the Settings tab, then tap Connect.',
   },
   {
     q: 'What does "illumination" mean?',
-    a: 'The satellite adjusts its reflective panels to redirect sunlight toward the GPS coordinates you specify. This can illuminate outdoor areas, construction sites, event venues, or agricultural fields during night or overcast conditions.',
+    a: 'The drone activates its high-power LED spotlight aimed at the GPS coordinates you specify. This can illuminate outdoor areas, construction sites, search zones, event venues, or agricultural fields on demand.',
   },
   {
     q: 'How accurate is the targeting?',
-    a: 'Accuracy depends on your GPS signal quality and the satellite\'s orbital position. Under ideal conditions, targeting precision is within 10–50 meters. Your device\'s GPS accuracy is shown on the camera screen.',
+    a: 'Accuracy depends on your GPS signal quality and the drone\'s flight precision. Under ideal conditions, targeting is within 2–5 meters. Your device\'s GPS accuracy is shown on the camera screen.',
   },
   {
-    q: 'Can I use the app without a real satellite?',
-    a: 'Yes. Set the Host field to "demo" in Settings to use simulation mode. All commands are processed locally and no real satellite is contacted.',
+    q: 'Can I use the app without a real drone?',
+    a: 'Yes. Set the Host field to "demo" in Settings to use simulation mode. All commands are processed locally and no drone is contacted.',
   },
   {
     q: 'How long does illumination last?',
-    a: 'Duration depends on your service plan and satellite orbit. Your provider will specify the maximum illumination window per session.',
+    a: 'Duration depends on the drone\'s battery and your mission parameters. The drone will illuminate until the battery requires it to return to home, or until you send a disconnect command.',
   },
 ];
 
@@ -50,30 +50,29 @@ export default function DocsScreen() {
       ]}
     >
       <Text style={styles.screenTitle}>DOCS</Text>
-      <Text style={styles.screenSubtitle}>How Satellite Sunlight works</Text>
+      <Text style={styles.screenSubtitle}>How Drone Illumination works</Text>
 
       {/* Section 1 */}
-      <DocSection title="GETTING SATELLITE ACCESS">
+      <DocSection title="CONNECTING TO YOUR DRONE">
         <Text style={styles.body}>
-          Satellite Sunlight requires access to a compatible orbital reflector satellite.
-          Contact a participating satellite service provider to{'\n\n'}
-          {'  '}1. Purchase or lease illumination time{'\n'}
-          {'  '}2. Receive your endpoint credentials (host, port, access code){'\n'}
-          {'  '}3. Enter those credentials in the <Text style={styles.highlight}>Settings</Text> tab{'\n'}
-          {'  '}4. Tap <Text style={styles.highlight}>Connect to Satellite</Text>
+          Helios connects directly to a companion computer running on your drone over WiFi.{'\n\n'}
+          {'  '}1. Power on the drone and companion computer{'\n'}
+          {'  '}2. Connect your phone to the <Text style={styles.highlight}>HELIOS-DRONE</Text> WiFi network{'\n'}
+          {'  '}3. Enter <Text style={styles.highlight}>192.168.4.1</Text> as the host in the <Text style={styles.highlight}>Settings</Text> tab{'\n'}
+          {'  '}4. Tap <Text style={styles.highlight}>Connect to Drone</Text>
         </Text>
       </DocSection>
 
       {/* Section 2 */}
       <DocSection title="HOW TO ILLUMINATE A LOCATION">
         <Text style={styles.body}>
-          Once connected to your satellite:
+          Once connected to your drone:
           {'\n\n'}
           {'  '}1. Switch to the <Text style={styles.highlight}>Camera</Text> tab{'\n'}
           {'  '}2. Point your camera at the target location{'\n'}
           {'  '}3. Align the target within the blue reticle{'\n'}
           {'  '}4. Tap the capture button{'\n\n'}
-          The app reads your device GPS coordinates, bundles them with the capture, and transmits an illumination command to the satellite. A white flash confirms the command was sent.
+          The app reads your device GPS coordinates and transmits an illumination command to the drone. A white flash confirms the command was sent.
         </Text>
       </DocSection>
 
@@ -86,12 +85,12 @@ export default function DocsScreen() {
           {'  →  '}
           <Text style={styles.highlight}>Command</Text>
           {'  →  '}
-          <Text style={styles.highlight}>Satellite</Text>
+          <Text style={styles.highlight}>Drone</Text>
           {'  →  '}
           <Text style={styles.highlight}>Illumination</Text>
         </Text>
         <Text style={[styles.body, { marginTop: Layout.spacing.md }]}>
-          Commands are transmitted via WebSocket (real-time) or HTTP (polling). The satellite acknowledges receipt and reports when illumination begins. Status is shown live on the camera HUD.
+          Commands are transmitted via WebSocket (real-time) or HTTP (polling). The drone acknowledges receipt and reports when illumination begins. Status is shown live on the camera HUD.
         </Text>
       </DocSection>
 

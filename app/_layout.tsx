@@ -1,15 +1,15 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { SatelliteProvider } from '../src/context/SatelliteContext';
+import { DroneProvider } from '../src/context/DroneContext';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <SatelliteProvider>
+      <DroneProvider>
         <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false }} />
-      </SatelliteProvider>
+      </DroneProvider>
     </SafeAreaProvider>
   );
 }

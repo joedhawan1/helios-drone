@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import * as Location from 'expo-location';
-import type { GpsCoordinates } from '../types/satellite';
+import type { GpsCoordinates } from '../types/drone';
 
 interface UseLocationResult {
   coords: GpsCoordinates | null;

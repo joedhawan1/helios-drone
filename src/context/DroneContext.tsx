@@ -7,26 +7,26 @@ import React, {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { satelliteService } from '../services/SatelliteService';
+import { droneService } from '../services/DroneService';
 import {
   ConnectionStatus,
   GpsCoordinates,
   IlluminateCommand,
   IlluminationStatus,
-  SatelliteContextValue,
-  SatelliteSettings,
+  DroneContextValue,
+  DroneSettings,
   DEFAULT_SETTINGS,
-} from '../types/satellite';
+} from '../types/drone';
 import { formatCommandId } from '../utils/formatters';
 
-const SETTINGS_KEY = 'satellite_settings_v1';
+const SETTINGS_KEY = 'drone_settings_v1';
 
-const SatelliteContext = createContext<SatelliteContextValue | null>(null);
+const DroneContext = createContext<DroneContextValue | null>(null);
 
-export function SatelliteProvider({ children }: { children: React.ReactNode }) {
+export function DroneProvider({ children }: { children: React.ReactNode }) {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [illuminationStatus, setIlluminationStatus] = useState<IlluminationStatus>('idle');
-  const [settings, setSettings] = useState<SatelliteSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<DroneSettings>(DEFAULT_SETTINGS);
   const [lastCommand, setLastCommand] = useState<IlluminateCommand | null>(null);
 
   // Keep a ref to current settings so event handlers always see fresh values
@@ -38,7 +38,7 @@ export function SatelliteProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.getItem(SETTINGS_KEY).then((raw) => {
       if (raw) {
         try {
-          setSettings(JSON.parse(raw) as SatelliteSettings);
+          setSettings(JSON.parse(raw) as DroneSettings);
         } catch {
           // ignore corrupt data
         }
@@ -46,36 +46,36 @@ export function SatelliteProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // Subscribe to satellite service events
+  // Subscribe to drone service events
   useEffect(() => {
     const unsubs = [
-      satelliteService.on('status:connecting', () => setConnectionStatus('connecting')),
-      satelliteService.on('status:connected', () => setConnectionStatus('connected')),
-      satelliteService.on('status:disconnected', () => {
+      droneService.on('status:connecting', () => setConnectionStatus('connecting')),
+      droneService.on('status:connected', () => setConnectionStatus('connected')),
+      droneService.on('status:disconnected', () => {
         setConnectionStatus('disconnected');
         setIlluminationStatus('idle');
       }),
-      satelliteService.on('status:error', () => setConnectionStatus('error')),
-      satelliteService.on('illuminate:sending', () => setIlluminationStatus('sending')),
-      satelliteService.on('illuminate:acknowledged', () =>
+      droneService.on('status:error', () => setConnectionStatus('error')),
+      droneService.on('illuminate:sending', () => setIlluminationStatus('sending')),
+      droneService.on('illuminate:acknowledged', () =>
         setIlluminationStatus('acknowledged'),
       ),
-      satelliteService.on('illuminate:active', () => setIlluminationStatus('active')),
-      satelliteService.on('illuminate:error', () => setIlluminationStatus('error')),
+      droneService.on('illuminate:active', () => setIlluminationStatus('active')),
+      droneService.on('illuminate:error', () => setIlluminationStatus('error')),
     ];
     return () => unsubs.forEach((u) => u());
   }, []);
 
   const connect = useCallback(async () => {
     try {
-      await satelliteService.connect(settingsRef.current);
+      await droneService.connect(settingsRef.current);
     } catch {
       setConnectionStatus('error');
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    satelliteService.disconnect();
+    droneService.disconnect();
   }, []);
 
   const illuminate = useCallback(
@@ -88,7 +88,7 @@ export function SatelliteProvider({ children }: { children: React.ReactNode }) {
       };
       setLastCommand(cmd);
       try {
-        await satelliteService.illuminate(cmd, settingsRef.current);
+        await droneService.illuminate(cmd, settingsRef.current);
       } catch {
         setIlluminationStatus('error');
       }
@@ -96,13 +96,13 @@ export function SatelliteProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const updateSettings = useCallback(async (newSettings: SatelliteSettings) => {
+  const updateSettings = useCallback(async (newSettings: DroneSettings) => {
     setSettings(newSettings);
     await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(newSettings));
   }, []);
 
   return (
-    <SatelliteContext.Provider
+    <DroneContext.Provider
       value={{
         connectionStatus,
         illuminationStatus,
@@ -115,12 +115,12 @@ export function SatelliteProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-    </SatelliteContext.Provider>
+    </DroneContext.Provider>
   );
 }
 
-export function useSatelliteContext(): SatelliteContextValue {
-  const ctx = useContext(SatelliteContext);
-  if (!ctx) throw new Error('useSatelliteContext must be used within SatelliteProvider');
+export function useDroneContext(): DroneContextValue {
+  const ctx = useContext(DroneContext);
+  if (!ctx) throw new Error('useDroneContext must be used within DroneProvider');
   return ctx;
 }

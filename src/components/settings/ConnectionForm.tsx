@@ -1,16 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View, Pressable } from 'react-native';
-import type { SatelliteSettings, Protocol } from '../../types/satellite';
+import type { DroneSettings, Protocol } from '../../types/drone';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
 
 interface ConnectionFormProps {
-  values: SatelliteSettings;
-  onChange: (values: SatelliteSettings) => void;
+  values: DroneSettings;
+  onChange: (values: DroneSettings) => void;
 }
 
 export function ConnectionForm({ values, onChange }: ConnectionFormProps) {
-  const set = (field: keyof SatelliteSettings, value: string) =>
+  const set = (field: keyof DroneSettings, value: string) =>
     onChange({ ...values, [field]: value });
 
   return (
