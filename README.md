@@ -1,23 +1,36 @@
-# Helios
+# Helios Drone
 
-**Helios** is a mobile app that lets users command an orbital reflector satellite to direct sunlight onto a GPS-targeted location — right from their phone. Point the camera, tap capture, and the satellite does the rest.
+**Helios Drone** is an extension of [Helios](https://github.com/joedhawan1/helios) — the original orbital reflector satellite control app — rebuilt around drones instead of satellites. The same phone-to-target illumination concept, now using a drone-mounted 50W LED spotlight you can build and own for under $500.
 
-Built with React Native and Expo Go. No login required.
+Built with React Native and Expo. No login required. Works with any drone running the included companion server.
+
+---
+
+## How It Works
+
+1. **Aim** — Point your phone camera at the target location
+2. **Capture** — Tap the capture button; the app reads your GPS coordinates
+3. **Illuminate** — A command is sent to the drone over WiFi; the LED activates in under 500ms
+
+The drone runs a lightweight Node.js server on a Raspberry Pi companion computer. The server receives commands over WebSocket or HTTP and drives a 50W LED module via GPIO. No cloud relay — your phone talks directly to the drone.
 
 ---
 
 ## Features
 
-- **Live camera targeting** — Point your camera at any location and lock it in with a precision reticle overlay
-- **GPS-based illumination commands** — Your device coordinates are bundled with each capture and transmitted to the satellite endpoint
-- **Satellite connection management** — Connect via WebSocket or HTTP to any compatible satellite control server
-- **Demo mode** — Fully simulated satellite experience with no real hardware required
-- **Persistent settings** — Endpoint credentials are saved locally across sessions
-- **In-app documentation** — Setup guides, FAQ, and protocol reference built right in
+- **Live camera targeting** — Precision reticle overlay with real-time GPS readout
+- **Direct drone connection** — WebSocket or HTTP over drone WiFi (no internet required)
+- **Sub-500ms activation** — LED activates within half a second of command receipt
+- **Demo mode** — Full simulated experience with no hardware needed (set host to `demo`)
+- **Persistent settings** — Connection credentials saved locally across sessions
+- **In-app documentation** — Setup guide, FAQ, and protocol reference built in
+- **Companion server included** — `drone-server/` runs on Raspberry Pi and controls GPIO
 
 ---
 
 ## Tech Stack
+
+### Mobile App
 
 | Layer | Technology |
 |---|---|
@@ -29,6 +42,16 @@ Built with React Native and Expo Go. No login required.
 | Language | TypeScript |
 | Styling | React Native StyleSheet (no external UI lib) |
 
+### Drone Server
+
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js 20 on Raspberry Pi |
+| WebSocket | ws |
+| HTTP | Express |
+| GPIO | onoff (Raspberry Pi sysfs GPIO) |
+| Language | TypeScript |
+
 ---
 
 ## Getting Started
@@ -36,62 +59,91 @@ Built with React Native and Expo Go. No login required.
 ### Prerequisites
 
 - [Node.js](https://nodejs.org) 18 or later
-- [Expo Go](https://expo.dev/go) installed on your iOS or Android device
-- npm 9+
+- [Expo Go](https://expo.dev/go) on your iOS or Android device
 
-### Installation
+### Mobile App
 
 ```bash
-# Clone the repository
-git clone https://github.com/joedhawan/helios.git
-cd helios
+git clone https://github.com/joedhawan/lumen.git
+cd lumen
 
-# Install dependencies
 npm install --legacy-peer-deps
-
-# Start the development server
 npx expo start
 ```
 
-Scan the QR code in your terminal with the **Expo Go** app on your device.
+Scan the QR code with **Expo Go**. To test without a drone, open Settings and set Host to `demo`.
+
+### Drone Server (Raspberry Pi)
+
+```bash
+cd drone-server
+npm install
+npm run build
+
+# Run with real GPIO (on Raspberry Pi)
+NODE_ENV=production LED_PIN=18 npm start
+
+# Run in mock mode (any machine — no GPIO required)
+npm run dev:mock
+```
+
+See [`drone-server/README.md`](drone-server/README.md) for full hardware wiring instructions, WiFi access point setup, and systemd service configuration.
 
 ---
 
-## Connecting to a Satellite
+## Connecting the App to Your Drone
 
-1. Open the **Settings** tab
-2. Enter the credentials provided by your satellite service provider:
-   - **Host** — IP address or hostname (e.g. `control.example.com`)
-   - **Port** — e.g. `8080`
-   - **Access Code** — your auth token (leave blank if not required)
-   - **Protocol** — `WS` (WebSocket) or `HTTP`
-3. Tap **Connect to Satellite**
+1. Power on the drone and companion computer
+2. Connect your phone to the **HELIOS-DRONE** WiFi network
+3. Open the **Settings** tab in the app
+4. Enter:
+   - **Host** — `192.168.4.1` (drone RPi AP address)
+   - **Port** — `8080`
+   - **Access Code** — leave blank unless you set `ACCESS_CODE` on the server
+   - **Protocol** — `WS` (recommended) or `HTTP`
+5. Tap **Connect to Drone**
 
-> **No satellite access yet?** Set Host to `demo` to simulate the full experience locally.
+---
 
-### Expected Server Protocol
+## Hardware
 
-The app communicates using a simple JSON protocol over WebSocket or HTTP.
+The recommended drone server build costs around **$500** and produces **~4,500–5,000 lumens**:
 
-**WebSocket — Client to Server:**
+| Component | Part | Cost |
+|---|---|---|
+| Companion computer | Raspberry Pi 4 | ~$80 |
+| LED module | 50W COB Cool White (30–36V) | ~$20 |
+| MOSFET driver | IRLZ44N (logic-level N-channel) | ~$2 |
+| Power supply | Mean Well LRS-100-36 (36V/3A) | ~$25 |
+| Gate resistor | 100Ω resistor | <$1 |
+| Flyback diode | 1N4007 | <$1 |
+
+Wiring and RPi configuration details are in [`drone-server/README.md`](drone-server/README.md).
+
+---
+
+## Protocol Reference
+
+The drone server implements a simple JSON protocol over WebSocket or HTTP.
+
+**WebSocket:**
 ```json
-{ "type": "auth", "payload": { "code": "YOUR_ACCESS_CODE" } }
-{ "type": "illuminate", "payload": { "commandId": "ABC123", "coordinates": { "latitude": 38.8977, "longitude": -77.0366, "altitude": 15.2 }, "timestamp": 1711580400000 } }
-```
-
-**WebSocket — Server to Client:**
-```json
+// Auth (if ACCESS_CODE is set)
+{ "type": "auth", "payload": { "code": "YOUR_CODE" } }
 { "type": "auth_ok" }
-{ "type": "illuminate_ack", "payload": { "commandId": "ABC123", "eta": 3000 } }
+
+// Illuminate
+{ "type": "illuminate", "payload": { "commandId": "ABC123", "coordinates": { "latitude": 38.8977, "longitude": -77.0366, "altitude": 15.2 }, "timestamp": 1711580400000 } }
+{ "type": "illuminate_ack", "payload": { "commandId": "ABC123", "eta": 500 } }
 { "type": "illuminate_active", "payload": { "commandId": "ABC123" } }
-{ "type": "error", "payload": { "message": "Target out of range" } }
+{ "type": "error", "payload": { "message": "..." } }
 ```
 
-**HTTP Endpoints:**
+**HTTP:**
 ```
 GET  /ping                → 200 { "status": "online" }
-POST /illuminate          → 202 { "commandId": "...", "eta": 3000 }
-GET  /status/:commandId   → 200 { "status": "active" | "pending" | "error" }
+POST /illuminate          → 202 { "commandId": "...", "eta": 500 }
+GET  /status/:commandId   → 200 { "status": "pending" | "active" | "completed" | "error" }
 ```
 
 ---
@@ -99,29 +151,36 @@ GET  /status/:commandId   → 200 { "status": "active" | "pending" | "error" }
 ## Project Structure
 
 ```
-helios/
-├── app/                        # expo-router screens (file-based routing)
-│   ├── _layout.tsx             # Root layout — wraps app in providers
+lumen/
+├── app/                          # Expo Router screens
+│   ├── _layout.tsx               # Root layout with DroneProvider
 │   └── (tabs)/
-│       ├── _layout.tsx         # Tab bar configuration
-│       ├── index.tsx           # Camera screen
-│       ├── settings.tsx        # Settings screen
-│       └── docs.tsx            # Documentation screen
+│       ├── _layout.tsx           # Tab bar (Camera, Settings, Docs)
+│       ├── index.tsx             # Camera targeting screen
+│       ├── settings.tsx          # Drone connection settings
+│       └── docs.tsx              # In-app documentation
 ├── src/
-│   ├── types/satellite.ts      # Shared TypeScript interfaces
-│   ├── constants/              # Design tokens (colors, layout)
-│   ├── services/
-│   │   └── SatelliteService.ts # WebSocket/HTTP/mock communication layer
-│   ├── context/
-│   │   └── SatelliteContext.tsx# Global React state bridge
-│   ├── hooks/                  # useSatellite, useLocation
+│   ├── types/drone.ts            # Shared TypeScript interfaces
+│   ├── constants/                # Colors, spacing tokens
+│   ├── services/DroneService.ts  # WebSocket / HTTP / mock comms
+│   ├── context/DroneContext.tsx  # Global React state
+│   ├── hooks/                    # useDrone, useLocation
 │   ├── components/
-│   │   ├── ui/                 # Card, GlowButton, StatusBadge
-│   │   ├── camera/             # TargetingReticle, HUDOverlay, CaptureButton
-│   │   └── settings/           # ConnectionForm
-│   └── utils/formatters.ts     # Coordinate and status formatters
-├── assets/                     # App icon and splash screen
-├── app.json                    # Expo configuration
+│   │   ├── ui/                   # Card, GlowButton, StatusBadge
+│   │   ├── camera/               # TargetingReticle, HUDOverlay, CaptureButton
+│   │   └── settings/             # ConnectionForm
+│   └── utils/formatters.ts       # Coordinate and status formatters
+├── drone-server/                 # Raspberry Pi companion server
+│   ├── src/
+│   │   ├── server.ts             # Express + WebSocket server
+│   │   ├── ledController.ts      # GPIO / mock LED abstraction
+│   │   ├── commandManager.ts     # Command lifecycle and timers
+│   │   ├── config.ts             # Env-var configuration
+│   │   └── types.ts              # Protocol type definitions
+│   └── README.md                 # Hardware wiring + RPi setup guide
+├── docs/index.html               # Marketing / documentation website
+├── assets/                       # App icon and splash screen
+├── app.json                      # Expo configuration
 └── package.json
 ```
 

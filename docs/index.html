@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Helios — Orbital Reflector Control</title>
+  <title>Helios — Drone Illumination Control</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -153,19 +153,43 @@
       background: var(--bg-surface); border: 1px solid var(--border);
       aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
     }
-    .about-visual .orbit-ring {
-      width: 240px; height: 240px; border: 2px dashed rgba(59,130,246,.25);
-      border-radius: 50%; position: relative; animation: spin 20s linear infinite;
+
+    /* Drone animation */
+    .drone-scene {
+      position: relative;
+      width: 200px; height: 200px;
+      display: flex; align-items: center; justify-content: center;
     }
-    .about-visual .sat {
-      position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
-      width: 16px; height: 16px; background: var(--accent-blue); border-radius: 50%;
-      box-shadow: 0 0 20px var(--accent-blue);
+    .drone-body {
+      animation: hover 3s ease-in-out infinite;
+      position: relative; z-index: 2;
     }
-    .about-visual .earth {
-      position: absolute; inset: 0; margin: auto; width: 60px; height: 60px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-success));
-      border-radius: 50%; opacity: .7;
+    .drone-svg {
+      width: 80px; height: 80px;
+      filter: drop-shadow(0 0 16px rgba(59,130,246,.6));
+    }
+    .spotlight-beam {
+      position: absolute;
+      bottom: -20px; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-top: 60px solid rgba(251,191,36,.12);
+      filter: blur(4px);
+      z-index: 1;
+    }
+    .spotlight-glow {
+      position: absolute;
+      bottom: -40px; left: 50%;
+      transform: translateX(-50%);
+      width: 80px; height: 20px;
+      background: radial-gradient(ellipse, rgba(251,191,36,.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    @keyframes hover {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -202,20 +226,39 @@
     .why-card .highlight.freedom { background: rgba(6,182,212,.12); color: var(--accent-cyan); }
 
     /* ---- Demo ---- */
-    .demo-wrapper {
-      position: relative; border-radius: 20px; overflow: hidden;
-      background: var(--bg-surface); border: 1px solid var(--border);
-      aspect-ratio: 16/9; max-width: 800px; margin: 0 auto;
+    .demo-section-inner {
+      display: flex; align-items: center; gap: 72px;
     }
-    .demo-wrapper video {
-      width: 100%; height: 100%; object-fit: cover;
+    .demo-text { flex: 1; }
+    .demo-text .section-label { display: inline-block; margin-bottom: 16px; }
+    .demo-text h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
+    .demo-text p { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; margin-bottom: 24px; }
+    .demo-text ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .demo-text ul li { display: flex; align-items: flex-start; gap: 10px; color: var(--text-secondary); font-size: .95rem; }
+    .demo-text ul li::before { content: "→"; color: var(--accent-cyan); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .phone-frame {
+      flex-shrink: 0; width: 240px;
+      background: #0c0c14;
+      border: 2px solid rgba(255,255,255,.1);
+      border-radius: 44px;
+      padding: 14px 12px;
+      box-shadow: 0 0 80px rgba(6,182,212,.18), 0 32px 64px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
     }
-    .demo-placeholder {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 12px; color: var(--text-muted);
+    .phone-notch {
+      width: 56px; height: 6px;
+      background: rgba(255,255,255,.12); border-radius: 3px;
+      margin: 0 auto 10px;
     }
-    .demo-placeholder svg { opacity: .4; }
-    .demo-placeholder span { font-size: .875rem; }
+    .phone-screen {
+      border-radius: 30px; overflow: hidden;
+      aspect-ratio: 9/19.5; background: #000; position: relative;
+    }
+    .phone-screen video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 820px) {
+      .demo-section-inner { flex-direction: column-reverse; align-items: center; gap: 40px; }
+      .demo-text { text-align: center; }
+      .demo-text ul li { justify-content: center; }
+    }
 
     /* ---- Setup ---- */
     .setup-steps { max-width: 680px; }
@@ -297,9 +340,9 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <div class="hero-badge">Open Source Satellite Control</div>
-    <h1>Command sunlight<br>from your <span class="gradient">phone</span></h1>
-    <p>Helios lets you direct an orbital reflector satellite to illuminate any GPS coordinate on Earth — no middleman, no service fees, no gatekeepers. Just you and the sun.</p>
+    <div class="hero-badge">Autonomous Drone Illumination</div>
+    <h1>Precision light,<br><span class="gradient">on demand</span></h1>
+    <p>Helios lets you command a high-power LED drone to illuminate any GPS-targeted location from your phone — construction sites, search zones, events, or fields. No middleman, no service fees.</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="https://github.com/joedhawan/repo-local" target="_blank" rel="noopener">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -316,15 +359,35 @@
     <div class="about-grid">
       <div class="about-text">
         <span class="section-label">About</span>
-        <h2 class="section-title">Sunlight, on demand</h2>
-        <p>Helios is an open-source mobile app that communicates directly with orbital reflector satellites — spacecraft equipped with large, lightweight mirrors that redirect concentrated sunlight to precise locations on Earth.</p>
-        <p>Point your phone's camera at any spot, tap capture, and your GPS coordinates are transmitted to the satellite. Within seconds, the reflector adjusts its angle and <strong>directs a beam of sunlight exactly where you aimed</strong>.</p>
-        <p>The entire flow — from targeting to illumination — happens on your device. There's no account to create, no subscription, no approval queue. <strong>You own the entire pipeline.</strong></p>
+        <h2 class="section-title">Aerial light, instant control</h2>
+        <p>Helios is an open-source mobile app that connects directly to a companion computer running on your drone — a Raspberry Pi paired with a 50W LED spotlight module capable of <strong>4,500–6,000 lumens</strong> of output.</p>
+        <p>Point your phone's camera at any location, tap capture, and your GPS coordinates are sent directly to the drone over WiFi. Within half a second, <strong>the LED activates and illuminates the target area</strong>.</p>
+        <p>The entire pipeline — from targeting to illumination — runs on hardware you own. No cloud service, no subscription, no approval queue. <strong>You own the drone, you control the light.</strong></p>
       </div>
       <div class="about-visual">
-        <div class="earth"></div>
-        <div class="orbit-ring">
-          <div class="sat"></div>
+        <div class="drone-scene">
+          <div class="drone-body">
+            <!-- Drone SVG -->
+            <svg class="drone-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Arms -->
+              <line x1="40" y1="40" x2="15" y2="20" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+              <line x1="40" y1="40" x2="65" y2="20" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+              <line x1="40" y1="40" x2="15" y2="60" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+              <line x1="40" y1="40" x2="65" y2="60" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+              <!-- Rotors -->
+              <ellipse cx="15" cy="20" rx="10" ry="4" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.7"/>
+              <ellipse cx="65" cy="20" rx="10" ry="4" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.7"/>
+              <ellipse cx="15" cy="60" rx="10" ry="4" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.7"/>
+              <ellipse cx="65" cy="60" rx="10" ry="4" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.7"/>
+              <!-- Body -->
+              <rect x="30" y="32" width="20" height="16" rx="4" fill="#1C2333" stroke="#3B82F6" stroke-width="1.5"/>
+              <!-- LED spotlight -->
+              <circle cx="40" cy="52" r="4" fill="#FCD34D" opacity="0.9"/>
+              <circle cx="40" cy="52" r="6" fill="none" stroke="#FCD34D" stroke-width="1" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="spotlight-beam"></div>
+          <div class="spotlight-glow"></div>
         </div>
       </div>
     </div>
@@ -333,16 +396,26 @@
 
 <!-- Demo -->
 <section id="demo">
-  <div class="container" style="text-align: center;">
-    <span class="section-label">Demo</span>
-    <h2 class="section-title">See it in action</h2>
-    <p class="section-subtitle" style="margin-left: auto; margin-right: auto;">Watch the full flow — from opening the app to illuminating a target.</p>
-    <div class="demo-wrapper">
-      <video id="demo-video" autoplay loop muted playsinline>
-        <source src="demo.mp4" type="video/mp4">
-      </video>
-      <div class="demo-placeholder" id="demo-placeholder">
-        <span>Demo video coming soon</span>
+  <div class="container">
+    <div class="demo-section-inner">
+      <div class="demo-text">
+        <span class="section-label">Demo</span>
+        <h2>See it in action</h2>
+        <p>Watch the full flow — connect to your drone, lock a GPS target with the camera, and transmit an illuminate command in seconds.</p>
+        <ul>
+          <li>Live camera feed with precision targeting reticle</li>
+          <li>Real-time GPS coordinate capture on tap</li>
+          <li>WebSocket command dispatch with live status HUD</li>
+          <li>Works in demo mode — no hardware needed</li>
+        </ul>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <video id="demo-video" autoplay loop muted playsinline>
+            <source src="03292.mov" type="video/mp4">
+          </video>
+        </div>
       </div>
     </div>
   </div>
@@ -352,38 +425,38 @@
 <section id="use-cases" style="background: var(--bg-surface);">
   <div class="container">
     <span class="section-label">Use Cases</span>
-    <h2 class="section-title">Why redirect sunlight?</h2>
-    <p class="section-subtitle">Directed sunlight has real, practical applications across agriculture, infrastructure, disaster response, and daily life.</p>
+    <h2 class="section-title">When you need light, anywhere</h2>
+    <p class="section-subtitle">A GPS-commanded drone spotlight has real, immediate applications across construction, emergency response, events, and more.</p>
     <div class="use-cases-grid">
       <div class="use-case-card">
-        <div class="use-case-icon">🌱</div>
-        <h3>Agriculture &amp; Crop Growth</h3>
-        <p>Extend growing seasons for farms in valleys, high latitudes, or shaded terrain. Supplemental sunlight boosts photosynthesis in regions that receive limited daylight hours — reducing dependence on artificial grow lights and their energy costs.</p>
-      </div>
-      <div class="use-case-card">
-        <div class="use-case-icon">🏙️</div>
-        <h3>Shaded Urban Zones</h3>
-        <p>Dense cityscapes create permanent shadows at street level. Helios can illuminate public parks, plazas, and pedestrian areas trapped in high-rise shade — improving quality of life, vitamin D exposure, and reducing seasonal depression in urban populations.</p>
+        <div class="use-case-icon">🏗️</div>
+        <h3>Construction Sites</h3>
+        <p>Illuminate active construction sites for night-shift crews without installing permanent lighting infrastructure. Reposition the beam instantly as work shifts to different areas of the site.</p>
       </div>
       <div class="use-case-card">
         <div class="use-case-icon">🚨</div>
-        <h3>Disaster &amp; Emergency Response</h3>
-        <p>After natural disasters knock out power grids, orbital sunlight provides illumination for search-and-rescue teams operating at night or in overcast conditions — no generators, no fuel logistics, just instant light from orbit.</p>
+        <h3>Search &amp; Rescue</h3>
+        <p>Direct a high-lumen spotlight to search areas during night operations with GPS-precise targeting. Coordinate aerial illumination with ground teams via the mobile app in real time.</p>
       </div>
       <div class="use-case-card">
-        <div class="use-case-icon">⚡</div>
-        <h3>Solar Energy Boosting</h3>
-        <p>Supplement solar panel arrays during cloudy days or winter months when panel output plummets. Directed sunlight onto existing solar farms increases energy yield without installing additional panels — a force multiplier for renewable infrastructure.</p>
+        <div class="use-case-icon">🎬</div>
+        <h3>Film &amp; Event Production</h3>
+        <p>Dynamic aerial lighting for outdoor events, film sets, and sports venues. Reposition a 5,000-lumen spotlight in seconds — no rigging, no cranes, no setup time.</p>
       </div>
       <div class="use-case-card">
-        <div class="use-case-icon">🏔️</div>
-        <h3>Remote &amp; Polar Communities</h3>
-        <p>Towns above the Arctic Circle face months of polar night. Reflected sunlight can extend daylight hours for communities where darkness dominates half the year — supporting mental health, outdoor work, and normal daily routines.</p>
+        <div class="use-case-icon">🌱</div>
+        <h3>Agriculture</h3>
+        <p>Supplement lighting for greenhouses, night harvests, or field inspections. A drone-mounted LED covers large areas quickly with no permanent electrical infrastructure required.</p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">🚒</div>
+        <h3>Emergency Response</h3>
+        <p>After natural disasters knock out power grids, a drone provides instant illumination for first responders — no generators, no fuel logistics, just a battery and a bright LED.</p>
       </div>
       <div class="use-case-card">
         <div class="use-case-icon">🔬</div>
-        <h3>Scientific Research</h3>
-        <p>Deliver controlled, on-demand natural light for field research in ecology, glaciology, and atmospheric science. Researchers in caves, deep valleys, or underground observatories can receive direct sunlight without relocating equipment.</p>
+        <h3>Field Research</h3>
+        <p>Deliver controlled, on-demand illumination for night-time ecological surveys, archaeological excavations, or geological inspections in remote locations without power access.</p>
       </div>
     </div>
   </div>
@@ -393,28 +466,28 @@
 <section id="why">
   <div class="container">
     <span class="section-label">Why Helios</span>
-    <h2 class="section-title">Cut out the middleman</h2>
-    <p class="section-subtitle">Traditional satellite illumination services charge exorbitant fees, gate access behind enterprise contracts, and throttle usage. Helios puts you in direct control.</p>
+    <h2 class="section-title">Own your light source</h2>
+    <p class="section-subtitle">Commercial drone lighting services charge per-flight fees, require pre-approval, and lock you into proprietary hardware. Helios runs on a $500 custom build you own outright.</p>
     <div class="why-grid">
       <div class="why-card">
         <span class="highlight cost">Cost</span>
-        <h3>No service fees. Ever.</h3>
-        <p>Commercial reflector services charge per-minute illumination fees, monthly subscriptions, and API access costs that add up fast. Helios is free and open source — you connect directly to the satellite endpoint. The only cost is the hardware you already own: your phone.</p>
+        <h3>One-time hardware cost.</h3>
+        <p>A complete illumination-capable drone rig costs under $500 to build — Raspberry Pi, 50W LED module, MOSFET driver, and a flight controller. No monthly fees, no per-minute billing, no enterprise tier. Helios is free and open source.</p>
       </div>
       <div class="why-card">
         <span class="highlight control">Control</span>
-        <h3>Your satellite, your rules</h3>
-        <p>No rate limits. No approval queues. No "enterprise tier" to unlock basic features. Configure your own endpoint, set your own access codes, and issue illuminate commands whenever you need them. Full protocol documentation is built right into the app.</p>
+        <h3>Direct WiFi connection</h3>
+        <p>Your phone connects directly to the drone's WiFi access point — no cloud relay, no latency introduced by a remote server. Sub-500ms from command tap to LED activation. Full WebSocket and HTTP protocol documentation built into the app.</p>
       </div>
       <div class="why-card">
         <span class="highlight speed">Speed</span>
-        <h3>Point, tap, done</h3>
-        <p>Other platforms require web dashboards, coordinate entry forms, and manual scheduling. Helios uses your phone's camera and GPS — aim at a location, tap the capture button, and the command is sent instantly. The entire flow takes under 5 seconds.</p>
+        <h3>Point, tap, illuminated</h3>
+        <p>Other platforms require web dashboards, coordinate entry forms, and flight plan submissions. Helios uses your phone's camera and GPS — aim at a location, tap capture, and the LED activates in under a second. The entire flow takes under 5 seconds.</p>
       </div>
       <div class="why-card">
         <span class="highlight freedom">Freedom</span>
-        <h3>Self-hosted everything</h3>
-        <p>Run your own satellite control server or connect to any compatible endpoint. No vendor lock-in, no proprietary protocols. The WebSocket and HTTP interfaces are fully documented so you can integrate Helios into your own infrastructure, automation pipelines, or research workflows.</p>
+        <h3>Works on any drone platform</h3>
+        <p>The drone-server runs on any Raspberry Pi connected to a relay or MOSFET-driven LED. Compatible with custom ArduPilot builds, converted commercial drones, or tethered platforms. No vendor lock-in, no DJI SDK required.</p>
       </div>
     </div>
   </div>
@@ -424,39 +497,45 @@
 <section id="setup">
   <div class="container">
     <span class="section-label">Get Started</span>
-    <h2 class="section-title">Up and running in 2 minutes</h2>
-    <p class="section-subtitle">No accounts. No API keys. Just clone, install, and go.</p>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <p class="section-subtitle">No accounts. No API keys. Clone the repo, install dependencies, and connect to your drone.</p>
     <div class="setup-steps">
       <div class="step">
         <div class="step-num">1</div>
         <div>
-          <h3>Clone the repository</h3>
-          <p>Grab the source from GitHub.</p>
+          <h3>Clone &amp; install the app</h3>
+          <p>Clone the repository and install Expo dependencies.</p>
           <code>git clone https://github.com/joedhawan/repo-local.git
-cd repo-local</code>
+cd repo-local
+npm install --legacy-peer-deps
+npx expo start</code>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div>
-          <h3>Install dependencies</h3>
-          <p>Use the legacy peer deps flag for React 19 compatibility.</p>
-          <code>npm install --legacy-peer-deps</code>
+          <h3>Start the drone server</h3>
+          <p>On your Raspberry Pi (or any machine for mock testing), start the companion server.</p>
+          <code>cd drone-server
+npm install
+# Mock mode (no GPIO hardware needed)
+npm run dev:mock
+# Production on RPi with real LED
+NODE_ENV=production npm start</code>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div>
-          <h3>Start the dev server</h3>
-          <p>Scan the QR code with <strong>Expo Go</strong> on your phone.</p>
-          <code>npx expo start</code>
+          <h3>Connect your phone to the drone WiFi</h3>
+          <p>Connect to the <strong>HELIOS-DRONE</strong> WiFi network broadcast by the Raspberry Pi access point.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div>
-          <h3>Connect to a satellite</h3>
-          <p>Open the Settings tab, enter your endpoint credentials, and tap Connect. Set host to <strong>demo</strong> to try the full experience with simulated hardware.</p>
+          <h3>Configure &amp; connect in the app</h3>
+          <p>Open the Settings tab, enter <strong>192.168.4.1</strong> as host and <strong>8080</strong> as port, then tap Connect to Drone. Use the Camera tab to illuminate any GPS target. Set host to <strong>demo</strong> to simulate without hardware.</p>
         </div>
       </div>
     </div>
@@ -473,21 +552,14 @@ cd repo-local</code>
         @joedhawan
       </a>
       <a href="https://github.com/joedhawan" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         joedhawan
       </a>
     </div>
   </div>
 </footer>
 
-<script>
-  // Hide placeholder if video loads
-  const video = document.getElementById('demo-video');
-  const placeholder = document.getElementById('demo-placeholder');
-  video.addEventListener('loadeddata', () => { placeholder.style.display = 'none'; });
-  // If no video source loads, keep placeholder visible
-  video.addEventListener('error', () => { placeholder.style.display = 'flex'; });
-</script>
+<script></script>
 
 </body>
 </html>
