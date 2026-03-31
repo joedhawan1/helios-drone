@@ -23,6 +23,7 @@ import type {
   WeatherData,
 } from '../types/drone';
 import { formatCommandId } from '../utils/formatters';
+import { telemetryService } from '../services/TelemetryService';
 
 const FLEET_KEY = 'helios_fleet_v1';
 const WEATHER_API_KEY = 'helios_weather_api_key';
@@ -119,7 +120,22 @@ export function FleetProvider({ children }: { children: React.ReactNode }) {
 
   const illuminateFleet = useCallback(async (coords: GpsCoordinates, photoUri: string | null) => {
     const brightness = weather?.brightnessRecommendation;
-    await fleetService.illuminateAll(coords, photoUri, brightness);
+    const infos = fleetService.getAllDroneInfo();
+    const commandIds = infos.map((d) => {
+      const cmdId = formatCommandId();
+      telemetryService.recordCommand(d.id, d.label, cmdId);
+      return cmdId;
+    });
+    try {
+      await fleetService.illuminateAll(coords, photoUri, brightness);
+      commandIds.forEach((cmdId) => {
+        telemetryService.recordResponse(cmdId, 'success');
+      });
+    } catch {
+      commandIds.forEach((cmdId) => {
+        telemetryService.recordResponse(cmdId, 'error');
+      });
+    }
   }, [weather]);
 
   const fetchWeatherCb = useCallback(async (coords: GpsCoordinates) => {

@@ -95,6 +95,67 @@ export interface DroneContextValue {
   updateSettings: (settings: DroneSettings) => Promise<void>;
 }
 
+// ── Mission Recorder & Playback ──
+
+export interface MissionWaypoint {
+  id: string;
+  latitude: number;
+  longitude: number;
+  altitude?: number;
+  illuminateDuration: number;
+  brightness: number;
+  delayAfter: number;
+}
+
+export interface Mission {
+  id: string;
+  name: string;
+  waypoints: MissionWaypoint[];
+  droneIds: string[];
+  createdAt: string;
+  lastRunAt?: string;
+}
+
+// ── Telemetry Dashboard ──
+
+export interface CommandLog {
+  commandId: string;
+  droneId: string;
+  droneName: string;
+  sentAt: number;
+  respondedAt?: number;
+  status: 'pending' | 'success' | 'timeout' | 'error';
+  latencyMs?: number;
+}
+
+export interface TelemetryStats {
+  droneId?: string;
+  totalCommands: number;
+  successRate: number;
+  avgLatencyMs: number;
+  totalIlluminationMs: number;
+}
+
+// ── Fleet Formation Mode ──
+
+export type FormationShape = 'line' | 'v-shape' | 'circle' | 'grid';
+export type FireMode = 'simultaneous' | 'sequential' | 'ripple';
+
+export interface FormationSlot {
+  position: number;
+  droneId: string;
+}
+
+export interface Formation {
+  id: string;
+  name: string;
+  shape: FormationShape;
+  fireMode: FireMode;
+  slots: FormationSlot[];
+  delayBetweenMs: number;
+  brightness: number;
+}
+
 export const DEFAULT_SETTINGS: DroneSettings = {
   host: 'demo',
   port: '8080',

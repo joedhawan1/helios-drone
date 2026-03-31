@@ -14,6 +14,7 @@ interface HUDOverlayProps {
   coords: GpsCoordinates | null;
   locationError: string | null;
   weather?: WeatherData | null;
+  recording?: boolean;
 }
 
 const MONO = Platform.select({ ios: 'Courier New', android: 'monospace', default: 'monospace' });
@@ -24,6 +25,7 @@ export function HUDOverlay({
   coords,
   locationError,
   weather,
+  recording,
 }: HUDOverlayProps) {
   const insets = useSafeAreaInsets();
   const isActive = illuminationStatus === 'active';
@@ -34,6 +36,12 @@ export function HUDOverlay({
       {/* Top bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + Layout.spacing.sm }]}>
         <Text style={styles.appTitle}>HELIOS v1.01</Text>
+        {recording && (
+          <View style={styles.recBadge}>
+            <Text style={styles.recDot}>●</Text>
+            <Text style={styles.recText}>REC</Text>
+          </View>
+        )}
         <View style={styles.topRight}>
           {weather && (
             <View style={styles.weatherBadge}>
@@ -106,6 +114,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 3,
+  },
+  recBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.accent.danger + '30',
+    borderRadius: Layout.borderRadius.full,
+    paddingHorizontal: Layout.spacing.sm,
+    paddingVertical: Layout.spacing.xs,
+    gap: 4,
+  },
+  recDot: {
+    color: Colors.accent.danger,
+    fontSize: 10,
+  },
+  recText: {
+    color: Colors.accent.danger,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
   reticleWrapper: {
     flex: 1,

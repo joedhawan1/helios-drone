@@ -25,6 +25,9 @@ The drone runs a lightweight Node.js server on a Raspberry Pi companion computer
 - **Persistent settings** — Connection credentials saved locally across sessions
 - **In-app documentation** — Setup guide, FAQ, and protocol reference built in
 - **Companion server included** — `drone-server/` runs on Raspberry Pi and controls GPIO
+- **Mission Recorder & Playback** — Record GPS waypoints during live captures, save as replayable missions, and play them back across the fleet
+- **Telemetry Dashboard** — Real-time command logging with per-drone stats, success rates, latency tracking, and command history
+- **Fleet Formation Mode** — Arrange drones in line, V-shape, circle, or grid formations with simultaneous, sequential, or ripple fire modes
 
 ---
 

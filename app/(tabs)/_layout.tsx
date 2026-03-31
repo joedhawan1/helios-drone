@@ -35,6 +35,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="telemetry"
+        options={{
+          title: 'Telemetry',
+          tabBarIcon: ({ focused, color }) => tabIcon('stats-chart', focused, color),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

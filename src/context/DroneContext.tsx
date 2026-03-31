@@ -18,6 +18,7 @@ import {
   DEFAULT_SETTINGS,
 } from '../types/drone';
 import { formatCommandId } from '../utils/formatters';
+import { telemetryService } from '../services/TelemetryService';
 
 const SETTINGS_KEY = 'drone_settings_v1';
 
@@ -87,9 +88,12 @@ export function DroneProvider({ children }: { children: React.ReactNode }) {
         commandId: formatCommandId(),
       };
       setLastCommand(cmd);
+      telemetryService.recordCommand('primary', 'Primary Drone', cmd.commandId);
       try {
         await droneService.illuminate(cmd, settingsRef.current);
+        telemetryService.recordResponse(cmd.commandId, 'success');
       } catch {
+        telemetryService.recordResponse(cmd.commandId, 'error');
         setIlluminationStatus('error');
       }
     },

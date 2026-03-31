@@ -17,8 +17,19 @@ import { FleetStatusBar } from '../../src/components/fleet/FleetStatusBar';
 import { WeatherCard } from '../../src/components/fleet/WeatherCard';
 import { ScheduleCard } from '../../src/components/fleet/ScheduleCard';
 import { ScheduleForm } from '../../src/components/fleet/ScheduleForm';
+import { MissionCard } from '../../src/components/fleet/MissionCard';
+import { FormationCard } from '../../src/components/fleet/FormationCard';
+import { FormationBuilder } from '../../src/components/fleet/FormationBuilder';
 import { GlowButton } from '../../src/components/ui/GlowButton';
-import type { DroneSettings, Protocol } from '../../src/types/drone';
+import { useMissionContext } from '../../src/context/MissionContext';
+import {
+  createFormation,
+  saveFormation,
+  loadFormations,
+  deleteFormation as deleteFormationStorage,
+  fireFormation,
+} from '../../src/services/FormationService';
+import type { DroneSettings, Protocol, Formation } from '../../src/types/drone';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
 
@@ -55,6 +66,19 @@ export default function FleetScreen() {
   const [connecting, setConnecting] = useState(false);
   const [illuminating, setIlluminating] = useState(false);
 
+  // Missions
+  const { missions, playMission, deleteMission, playbackStatus } = useMissionContext();
+  const [playingMissionId, setPlayingMissionId] = useState<string | null>(null);
+
+  // Formations
+  const [formations, setFormations] = useState<Formation[]>([]);
+  const [showFormationBuilder, setShowFormationBuilder] = useState(false);
+  const [firingFormationId, setFiringFormationId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    loadFormations().then(setFormations);
+  }, []);
+
   const handleAddDrone = () => {
     if (!newDrone.label.trim()) return;
     addDrone(newDrone.label.trim(), {
@@ -82,6 +106,37 @@ export default function FleetScreen() {
   const handleFetchWeather = async () => {
     const loc = coords ?? await requestLocation();
     if (loc) await fetchWeather(loc);
+  };
+
+  const handlePlayMission = async (mission: typeof missions[0]) => {
+    setPlayingMissionId(mission.id);
+    try { await playMission(mission); } finally { setPlayingMissionId(null); }
+  };
+
+  const handleCreateFormation = async (data: {
+    name: string;
+    shape: Formation['shape'];
+    fireMode: Formation['fireMode'];
+    droneIds: string[];
+    delayBetweenMs: number;
+    brightness: number;
+  }) => {
+    const formation = createFormation(data.name, data.shape, data.fireMode, data.droneIds, data.delayBetweenMs, data.brightness);
+    await saveFormation(formation);
+    setFormations(await loadFormations());
+    setShowFormationBuilder(false);
+  };
+
+  const handleDeleteFormation = async (id: string) => {
+    const updated = await deleteFormationStorage(id);
+    setFormations(updated);
+  };
+
+  const handleFireFormation = async (formation: Formation) => {
+    const loc = coords ?? await requestLocation();
+    if (!loc) return;
+    setFiringFormationId(formation.id);
+    try { await fireFormation(formation, loc); } finally { setFiringFormationId(null); }
   };
 
   return (
@@ -243,6 +298,51 @@ export default function FleetScreen() {
               if (!coords) requestLocation();
               setShowScheduleForm(true);
             }}
+            style={styles.addBtn}
+          />
+        )}
+
+        {/* ── MISSIONS ── */}
+        <Text style={[styles.sectionTitle, styles.sectionGap]}>MISSIONS</Text>
+        {missions.map((m) => (
+          <MissionCard
+            key={m.id}
+            mission={m}
+            onPlay={handlePlayMission}
+            onDelete={deleteMission}
+            playing={playingMissionId === m.id}
+          />
+        ))}
+        {missions.length === 0 && (
+          <Text style={styles.empty}>No missions recorded. Use REC on the Camera tab.</Text>
+        )}
+
+        {/* ── FORMATIONS ── */}
+        <Text style={[styles.sectionTitle, styles.sectionGap]}>FORMATIONS</Text>
+        {formations.map((f) => (
+          <FormationCard
+            key={f.id}
+            formation={f}
+            onFire={handleFireFormation}
+            onDelete={handleDeleteFormation}
+            firing={firingFormationId === f.id}
+          />
+        ))}
+        {formations.length === 0 && !showFormationBuilder && (
+          <Text style={styles.empty}>No formations</Text>
+        )}
+
+        {showFormationBuilder ? (
+          <FormationBuilder
+            fleet={fleet}
+            onSubmit={handleCreateFormation}
+            onCancel={() => setShowFormationBuilder(false)}
+          />
+        ) : (
+          <GlowButton
+            label="+ FORMATION"
+            variant="ghost"
+            onPress={() => setShowFormationBuilder(true)}
             style={styles.addBtn}
           />
         )}
