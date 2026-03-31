@@ -194,6 +194,7 @@ class DroneService {
           commandId: cmd.commandId,
           coordinates: cmd.coordinates,
           timestamp: cmd.timestamp,
+          brightness: cmd.brightness,
         },
       }),
     );
@@ -209,6 +210,7 @@ class DroneService {
         commandId: cmd.commandId,
         coordinates: cmd.coordinates,
         timestamp: cmd.timestamp,
+        brightness: cmd.brightness,
       }),
     });
     if (!resp.ok) {
@@ -246,4 +248,5 @@ class DroneService {
   }
 }
 
+export { DroneService };
 export const droneService = new DroneService();

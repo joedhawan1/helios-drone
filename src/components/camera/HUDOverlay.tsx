@@ -3,7 +3,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBadge } from '../ui/StatusBadge';
 import { TargetingReticle } from './TargetingReticle';
-import type { ConnectionStatus, GpsCoordinates, IlluminationStatus } from '../../types/drone';
+import type { ConnectionStatus, GpsCoordinates, IlluminationStatus, WeatherData } from '../../types/drone';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
 import { formatCoords, formatIlluminationStatus } from '../../utils/formatters';
@@ -13,6 +13,7 @@ interface HUDOverlayProps {
   illuminationStatus: IlluminationStatus;
   coords: GpsCoordinates | null;
   locationError: string | null;
+  weather?: WeatherData | null;
 }
 
 const MONO = Platform.select({ ios: 'Courier New', android: 'monospace', default: 'monospace' });
@@ -22,6 +23,7 @@ export function HUDOverlay({
   illuminationStatus,
   coords,
   locationError,
+  weather,
 }: HUDOverlayProps) {
   const insets = useSafeAreaInsets();
   const isActive = illuminationStatus === 'active';
@@ -32,8 +34,26 @@ export function HUDOverlay({
       {/* Top bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + Layout.spacing.sm }]}>
         <Text style={styles.appTitle}>HELIOS v1.01</Text>
-        <StatusBadge status={connectionStatus} />
+        <View style={styles.topRight}>
+          {weather && (
+            <View style={styles.weatherBadge}>
+              <Text style={styles.weatherText}>
+                {weather.condition.toUpperCase()} {weather.tempC.toFixed(0)}°C
+              </Text>
+            </View>
+          )}
+          <StatusBadge status={connectionStatus} />
+        </View>
       </View>
+
+      {/* Weather warnings */}
+      {weather && weather.warnings.length > 0 && (
+        <View style={styles.warningStrip}>
+          <Text style={styles.warningStripText}>
+            {weather.warnings[0]}
+          </Text>
+        </View>
+      )}
 
       {/* Scanning lines decoration */}
       <View style={styles.scanLine1} />
@@ -116,6 +136,37 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
     fontSize: 11,
     letterSpacing: 0.5,
+  },
+  topRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Layout.spacing.sm,
+  },
+  weatherBadge: {
+    backgroundColor: Colors.bg.elevated + 'CC',
+    borderRadius: Layout.borderRadius.full,
+    paddingHorizontal: Layout.spacing.sm,
+    paddingVertical: Layout.spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.accent.cyan + '40',
+  },
+  weatherText: {
+    color: Colors.accent.cyan,
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  warningStrip: {
+    backgroundColor: Colors.accent.warning + '20',
+    paddingVertical: Layout.spacing.xs,
+    paddingHorizontal: Layout.spacing.md,
+    alignItems: 'center',
+  },
+  warningStripText: {
+    color: Colors.accent.warning,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   scanLine1: {
     position: 'absolute',

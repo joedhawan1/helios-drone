@@ -45,7 +45,8 @@
         {
           "locationWhenInUsePermission": "Your GPS coordinates are sent to the satellite to pinpoint the illumination target."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

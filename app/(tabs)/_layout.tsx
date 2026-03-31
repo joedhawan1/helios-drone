@@ -28,6 +28,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="fleet"
+        options={{
+          title: 'Fleet',
+          tabBarIcon: ({ focused, color }) => tabIcon('layers', focused, color),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

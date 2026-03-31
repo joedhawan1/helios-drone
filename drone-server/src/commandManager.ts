@@ -41,7 +41,7 @@ class CommandManager {
       const cmd = this.commands.get(commandId);
       if (!cmd) return;
       cmd.status = 'active';
-      ledController.setBrightness(1.0);
+      ledController.setBrightness(payload.brightness ?? 1.0);
       this.callbacks.onActive(commandId);
       console.log(`[CMD] ${commandId} active — LED ON`);
 

@@ -15,12 +15,14 @@ import { GlowButton } from '../../src/components/ui/GlowButton';
 import { StatusBadge } from '../../src/components/ui/StatusBadge';
 import { useDrone } from '../../src/hooks/useDrone';
 import { useLocation } from '../../src/hooks/useLocation';
+import { useFleetContext } from '../../src/context/FleetContext';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
 
 export default function CameraScreen() {
   const { connectionStatus, illuminationStatus, connect, illuminate } = useDrone();
   const { coords, error: locationError, requestLocation } = useLocation();
+  const { weather } = useFleetContext();
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const flashOpacity = useRef(new Animated.Value(0)).current;
@@ -93,6 +95,7 @@ export default function CameraScreen() {
         illuminationStatus={illuminationStatus}
         coords={coords}
         locationError={locationError}
+        weather={weather}
       />
 
       {/* Flash overlay */}

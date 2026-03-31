@@ -95,10 +95,11 @@ app.get('/ping', (_req, res) => {
 
 // Send illuminate command via HTTP
 app.post('/illuminate', (req, res) => {
-  const { commandId, coordinates, timestamp } = req.body as {
+  const { commandId, coordinates, timestamp, brightness } = req.body as {
     commandId?: string;
     coordinates?: { latitude: number; longitude: number; altitude: number | null };
     timestamp?: number;
+    brightness?: number;
   };
 
   if (!commandId || !coordinates) {
@@ -118,7 +119,7 @@ app.post('/illuminate', (req, res) => {
   }
 
   console.log(`[HTTP] Illuminate command received: ${commandId}`);
-  const eta = commandManager.execute({ commandId, coordinates, timestamp: timestamp ?? Date.now() });
+  const eta = commandManager.execute({ commandId, coordinates, timestamp: timestamp ?? Date.now(), brightness });
   res.status(202).json({ commandId, eta });
 });
 

@@ -8,6 +8,7 @@ export interface IlluminatePayload {
   commandId: string;
   coordinates: GpsCoordinates;
   timestamp: number;
+  brightness?: number;
 }
 
 export type CommandStatus = 'pending' | 'active' | 'completed' | 'error';

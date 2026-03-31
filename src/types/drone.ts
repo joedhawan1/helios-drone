@@ -32,6 +32,56 @@ export interface IlluminateCommand {
   timestamp: number;
   photoUri: string | null;
   commandId: string;
+  brightness?: number;
+}
+
+export interface FleetDrone {
+  id: string;
+  label: string;
+  settings: DroneSettings;
+  connectionStatus: ConnectionStatus;
+  illuminationStatus: IlluminationStatus;
+}
+
+export type WeatherCondition = 'clear' | 'cloudy' | 'overcast' | 'rain' | 'storm' | 'snow' | 'fog';
+
+export interface WeatherData {
+  condition: WeatherCondition;
+  windSpeedMs: number;
+  tempC: number;
+  humidity: number;
+  description: string;
+  brightnessRecommendation: number;
+  warnings: string[];
+}
+
+export type Recurrence = 'none' | 'daily' | 'weekly';
+
+export interface Schedule {
+  id: string;
+  name: string;
+  coordinates: GpsCoordinates;
+  dateTime: number;
+  recurrence: Recurrence;
+  brightness: number;
+  droneIds: string[];
+  enabled: boolean;
+}
+
+export interface FleetContextValue {
+  fleet: FleetDrone[];
+  schedules: Schedule[];
+  weather: WeatherData | null;
+  weatherLoading: boolean;
+  addDrone: (label: string, settings: DroneSettings) => void;
+  removeDrone: (id: string) => void;
+  connectFleet: () => Promise<void>;
+  disconnectFleet: () => void;
+  illuminateFleet: (coords: GpsCoordinates, photoUri: string | null) => Promise<void>;
+  fetchWeather: (coords: GpsCoordinates) => Promise<void>;
+  createSchedule: (schedule: Omit<Schedule, 'id'>) => Promise<void>;
+  updateSchedule: (schedule: Schedule) => Promise<void>;
+  deleteSchedule: (id: string) => Promise<void>;
 }
 
 export interface DroneContextValue {
