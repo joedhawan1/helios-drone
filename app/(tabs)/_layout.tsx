@@ -49,6 +49,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="theater"
+        options={{
+          title: 'Theater',
+          tabBarIcon: ({ focused, color }) => tabIcon('videocam', focused, color),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

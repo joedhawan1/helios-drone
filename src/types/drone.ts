@@ -304,3 +304,85 @@ export const DEFAULT_SETTINGS: DroneSettings = {
   accessCode: '',
   protocol: 'ws',
 };
+
+// ── Swarm Theater: Choreography Engine ──────────────────────────
+
+export type EasingFunction = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce' | 'elastic';
+
+export type ShowPresetType = 'fireworks' | 'aurora' | 'constellation' | 'textSpell' | 'wave' | 'heartbeat' | 'countdown' | 'custom';
+
+export interface KeyFrame {
+  timeMs: number;
+  brightness: number;       // 0.0 – 1.0
+  colorTemp: 'warm' | 'neutral' | 'cool';
+  easing: EasingFunction;
+}
+
+export interface DroneTrack {
+  droneId: string;
+  keyframes: KeyFrame[];
+  formationOverrides?: { timeMs: number; offsetX: number; offsetY: number; offsetZ: number }[];
+}
+
+export interface ChoreographyScene {
+  id: string;
+  name: string;
+  durationMs: number;
+  formation: FormationShape;
+  tracks: DroneTrack[];
+  transition: 'cut' | 'crossfade' | 'blackout';
+  transitionDurationMs: number;
+}
+
+export interface Choreography {
+  id: string;
+  name: string;
+  scenes: ChoreographyScene[];
+  totalDurationMs: number;
+  bpm?: number;
+  createdAt: number;
+  lastPlayedAt?: number;
+}
+
+export interface AutoChoreographConfig {
+  sourceType: 'tapBpm' | 'audioAnalysis' | 'manual';
+  bpm: number;
+  intensity: 'subtle' | 'moderate' | 'intense' | 'extreme';
+  style: 'rhythmic' | 'melodic' | 'chaotic' | 'cinematic';
+  durationMs: number;
+  droneIds: string[];
+}
+
+export interface ShowPreset {
+  type: ShowPresetType;
+  name: string;
+  description: string;
+  minDrones: number;
+  choreography: Choreography;
+}
+
+export type SpectatorEvent =
+  | { type: 'sync'; showId: string; timeMs: number; totalMs: number }
+  | { type: 'keyframe'; droneId: string; brightness: number; colorTemp: string }
+  | { type: 'scene'; sceneIndex: number; sceneName: string }
+  | { type: 'ended' };
+
+export interface SpectatorSession {
+  showId: string;
+  hostName: string;
+  startedAt: number;
+  choreographyName: string;
+  spectatorCount: number;
+  shareCode: string;
+}
+
+export type TheaterPlaybackState = 'idle' | 'loading' | 'playing' | 'paused' | 'finished';
+
+export interface TheaterState {
+  playbackState: TheaterPlaybackState;
+  currentChoreography: Choreography | null;
+  currentSceneIndex: number;
+  currentTimeMs: number;
+  droneOutputs: Record<string, { brightness: number; colorTemp: string }>;
+  spectatorSession: SpectatorSession | null;
+}
