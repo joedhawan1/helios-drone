@@ -156,6 +156,148 @@ export interface Formation {
   brightness: number;
 }
 
+// ── Studio: Sound-Reactive Lightshow ──
+
+export type FrequencyBand = 'sub' | 'bass' | 'mid' | 'high' | 'brilliance';
+
+export type LightshowPattern = 'pulse' | 'strobe' | 'wave' | 'chase' | 'rainbow' | 'breathe';
+
+export interface AudioAnalysis {
+  bpm: number;
+  beatDetected: boolean;
+  bands: Record<FrequencyBand, number>; // 0.0–1.0 energy per band
+  overallEnergy: number; // 0.0–1.0
+  timestamp: number;
+}
+
+export interface LightshowConfig {
+  id: string;
+  name: string;
+  pattern: LightshowPattern;
+  sensitivity: number; // 0.0–1.0
+  minBrightness: number; // floor brightness 0.0–1.0
+  maxBrightness: number; // ceiling brightness 0.0–1.0
+  colorTemp: 'warm' | 'neutral' | 'cool';
+  bandMapping: Partial<Record<FrequencyBand, string[]>>; // band → droneIds
+  bpmOverride?: number; // manual BPM lock
+  strobeMaxHz: number; // safety cap for strobe frequency
+}
+
+export interface LightshowState {
+  active: boolean;
+  config: LightshowConfig | null;
+  currentAnalysis: AudioAnalysis | null;
+  droneOutputs: Record<string, number>; // droneId → current brightness
+}
+
+// ── Studio: Gesture Aim ("Sky Pointer") ──
+
+export interface DeviceOrientation {
+  alpha: number; // yaw (0–360)
+  beta: number;  // pitch (-180–180)
+  gamma: number; // roll (-90–90)
+}
+
+export interface AimVector {
+  azimuth: number; // horizontal angle in degrees (0–360)
+  elevation: number; // vertical angle (-90 to 90, negative = down)
+  intensity: number; // derived brightness from elevation (higher aim = dimmer)
+}
+
+export interface GestureAimConfig {
+  id: string;
+  sensitivityX: number; // horizontal sensitivity multiplier
+  sensitivityY: number; // vertical sensitivity multiplier
+  invertX: boolean;
+  invertY: boolean;
+  deadzone: number; // degrees of tilt to ignore (anti-jitter)
+  smoothing: number; // 0.0–1.0, exponential moving average factor
+  brightnessFromElevation: boolean; // auto-adjust brightness based on aim angle
+  targetDroneIds: string[]; // which drones respond to gesture
+}
+
+export interface GestureAimState {
+  active: boolean;
+  config: GestureAimConfig | null;
+  currentOrientation: DeviceOrientation | null;
+  currentAim: AimVector | null;
+  calibrationOffset: DeviceOrientation | null; // "zero" position
+}
+
+// ── Studio: AR Light Painting ──
+
+export interface PaintPoint {
+  x: number; // normalized 0.0–1.0 screen position
+  y: number;
+  timestamp: number;
+}
+
+export interface PaintStroke {
+  id: string;
+  points: PaintPoint[];
+  brightness: number;
+  speed: number; // playback speed multiplier
+  color: 'white' | 'warm' | 'cool';
+}
+
+export interface LightPaintCanvas {
+  id: string;
+  name: string;
+  strokes: PaintStroke[];
+  width: number; // reference canvas size
+  height: number;
+  createdAt: string;
+}
+
+export interface LightPaintConfig {
+  exposureTimeSec: number; // suggested camera exposure for long-exposure
+  droneSpeedMs: number; // ms per paint point (controls drone movement speed)
+  repeatCount: number; // how many times to trace the pattern
+  fadeTrail: boolean; // gradually reduce brightness along stroke tail
+  assignedDroneIds: string[]; // drones that execute the painting
+}
+
+export interface LightPaintState {
+  mode: 'idle' | 'drawing' | 'previewing' | 'executing';
+  canvas: LightPaintCanvas | null;
+  config: LightPaintConfig;
+  executionProgress: number; // 0.0–1.0
+  activeStrokeIndex: number;
+  activePointIndex: number;
+}
+
+// ── Studio Context ──
+
+export type StudioMode = 'lightshow' | 'gesture' | 'paint' | null;
+
+export interface StudioContextValue {
+  activeMode: StudioMode;
+  setActiveMode: (mode: StudioMode) => void;
+  lightshow: LightshowState;
+  gestureAim: GestureAimState;
+  lightPaint: LightPaintState;
+  // Lightshow
+  startLightshow: (config: LightshowConfig) => void;
+  stopLightshow: () => void;
+  tapBPM: () => void;
+  simulateBeat: () => void;
+  // Gesture Aim
+  startGestureAim: (config: GestureAimConfig) => void;
+  stopGestureAim: () => void;
+  calibrateGesture: () => void;
+  updateOrientation: (orientation: DeviceOrientation) => void;
+  // Light Paint
+  startDrawing: () => void;
+  addPaintPoint: (point: PaintPoint) => void;
+  endStroke: (brightness: number, speed: number) => void;
+  clearCanvas: () => void;
+  executeCanvas: (config: LightPaintConfig) => void;
+  stopExecution: () => void;
+  loadPreset: (name: string) => void;
+  saveCanvas: (name: string) => void;
+  loadSavedCanvases: () => Promise<LightPaintCanvas[]>;
+}
+
 export const DEFAULT_SETTINGS: DroneSettings = {
   host: 'demo',
   port: '8080',

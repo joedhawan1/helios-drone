@@ -42,6 +42,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="studio"
+        options={{
+          title: 'Studio',
+          tabBarIcon: ({ focused, color }) => tabIcon('color-wand', focused, color),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
